@@ -44,8 +44,10 @@ int main(void) {
         part1 += 2*face_sum + min_face;
         part2 += min_perim + volume;
     }
-    if (filename == "data/input.txt") assert(part1 == 1586300);
-    if (filename == "data/input.txt") assert(part2 == 3737498);
+    if (filename == "data/input.txt") {
+        assert(part1 == 1586300);
+        assert(part2 == 3737498);
+    }
 
     println("Part 1: {}", part1);
     println("Part 2: {}", part2);
