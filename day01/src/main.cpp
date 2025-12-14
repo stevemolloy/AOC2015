@@ -22,19 +22,24 @@ int main(void) {
     vector<string> file_contents = result.value();
 
     long part1 = 0;
-    for (const auto& line: file_contents) {
+    long part2 = 0;
+    for (int i=0; const auto& line: file_contents) {
         for (const auto& c: line) {
+            i += 1;
             if (c=='(') part1 += 1;
             else if (c==')') part1 -= 1;
             else {
                 println("ERROR: Unexpected char: {}", c);
                 return 1;
             }
+            if (part1==-1 && part2==0) part2 = i;
         }
     }
     if (filename == "data/input.txt") assert(part1 = 138);
+    if (filename == "data/input.txt") assert(part2 = 1771);
 
     println("Part 1: {}", part1);
+    println("Part 2: {}", part2);
 
     return 0;
 }
