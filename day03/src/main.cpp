@@ -49,31 +49,27 @@ int main(void) {
     long sx = 0, sy = 0, rx = 0, ry = 0;
     std::map<long, std::map<long, long>> part2_addresses;
     part2_addresses[sx][sy] = 2;
-    long turn = 0;
+    bool santa = true;
     for (const auto& line: file_contents) {
         for (const auto& c: line) {
-            bool santa_turn = (turn % 2) == 0;
             if (c == '<')      {
-                if (santa_turn) sx -= 1;
-                else rx -= 1;
-            }
-            else if (c == '>') {
-                if (santa_turn) sx += 1;
-                else rx += 1;
-            }
-            else if (c == 'v') {
-                if (santa_turn) sy -= 1;
-                else ry -= 1;
-            }
-            else if (c == '^') {
-                if (santa_turn) sy += 1;
-                else ry += 1;
-            }
-            else {
+                if (santa) sx -= 1;
+                else       rx -= 1;
+            } else if (c == '>') {
+                if (santa) sx += 1;
+                else       rx += 1;
+            } else if (c == 'v') {
+                if (santa) sy -= 1;
+                else       ry -= 1;
+            } else if (c == '^') {
+                if (santa) sy += 1;
+                else       ry += 1;
+            } else {
                 println("ERROR: Unexpected char: '{}'", c);
                 return 1;
             }
-            if (santa_turn) {
+
+            if (santa) {
                 if (part2_addresses.contains(sx) && part2_addresses[sx].contains(sy)) part2_addresses[sx][sy] += 1;
                 else {
                     part2_addresses[sx][sy] = 1;
@@ -86,7 +82,7 @@ int main(void) {
                     part2 += 1;
                 }
             }
-            turn += 1;
+            santa = !santa;
         }
     }
     if (filename == "data/input.txt") assert(part2 == 2631);
