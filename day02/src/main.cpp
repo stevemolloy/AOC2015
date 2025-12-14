@@ -25,21 +25,27 @@ int main(void) {
     vector<string> file_contents = result.value();
 
     long part1 = 0;
+    long part2 = 0;
+
     for (const auto& line: file_contents) {
-        println("{}", line);
         char delim;
         long x, y, z;
         std::stringstream ss(line);
         ss >> x >> delim >> y >> delim >> z;
 
         vector<long> faces{x*y, x*z, y*z};
-        long smallest = std::ranges::min(faces);
-        long sum = std::reduce(faces.begin(), faces.end());
+        vector<long> face_perims{2*(x+y), 2*(x+z), 2*(y+z)};
+        long volume = x*y*z;
 
-        part1 += 2*sum + smallest;
+        long min_face = std::ranges::min(faces);
+        long min_perim = std::ranges::min(face_perims);
+        long face_sum = std::reduce(faces.begin(), faces.end());
+
+        part1 += 2*face_sum + min_face;
+        part2 += min_perim + volume;
     }
-
-    long part2 = 0;
+    if (filename == "data/input.txt") assert(part1 == 1586300);
+    if (filename == "data/input.txt") assert(part2 == 3737498);
 
     println("Part 1: {}", part1);
     println("Part 2: {}", part2);
