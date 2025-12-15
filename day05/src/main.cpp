@@ -1,6 +1,7 @@
 #include <cassert>
 #include <expected>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <print>
 #include <fstream>
@@ -140,7 +141,7 @@ vector<Triple> get_all_triples(const string& str) {
     return result;
 }
 
-constexpr string vowels = "aeiou";
+constexpr std::string_view vowels = "aeiou";
 int count_vowels_in_str(const string& str) {
     int result = 0;
     for (char c: str) 
