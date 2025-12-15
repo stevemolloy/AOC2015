@@ -17,20 +17,6 @@ struct Triple {
     bool nice(void) const;
 };
 
-Triple::Triple(char first, char second, char third, int loc) :
-    first(first), second(second), third(third), loc(loc) {}
-
-Triple::Triple(string str, int loc) : loc(loc) {
-    assert(str.size() > 2);
-    first = str[0];
-    second = str[1];
-    third = str[2];
-}
-
-bool Triple::nice(void) const {
-    return first == third;
-}
-
 struct Pair {
     char first, second;
     int loc;
@@ -39,25 +25,14 @@ struct Pair {
     bool operator==(const Pair& other) const;
 };
 
-Pair::Pair(char first, char second, int loc) : first(first), second(second), loc(loc) {}
-Pair::Pair(string str, int loc) : loc(loc) {
-    assert(str.size() > 1);
-    first = str[0];
-    second = str[1];
-}
-
-bool Pair::operator==(const Pair& other) const {
-    return (first == other.first) && (second == other.second);
-}
-
 bool string_is_nice_part1(const string& str);
 bool string_is_nice_part2(const string& str);
 std::expected<vector<string>, string> read_file(const string &filename);
 int count_vowels_in_str(const string& str);
-bool pair_list_is_nice(vector<Pair> pairs);
-bool triple_list_is_nice(vector<Triple> triples);
-vector<Pair> get_all_pairs(string str);
-vector<Triple> get_all_triples(string str);
+bool pair_list_is_nice(const vector<Pair>& pairs);
+bool triple_list_is_nice(const vector<Triple>& triples);
+vector<Pair> get_all_pairs(const string& str);
+vector<Triple> get_all_triples(const string& str);
 
 int main(void) {
     {  // Part 1 tests
@@ -70,7 +45,6 @@ int main(void) {
     }
 
     { // Part 2 tests
-        string test_str;
         assert(string_is_nice_part2("qjhvhtzxzqqjkmpb"));
         assert(string_is_nice_part2("xxyxx"));
         assert(!string_is_nice_part2("uurcxstgmygtbstg"));
@@ -101,7 +75,33 @@ int main(void) {
     return 0;
 }
 
-bool pair_list_is_nice(vector<Pair> pairs) {
+Pair::Pair(char first, char second, int loc) : first(first), second(second), loc(loc) {}
+Pair::Pair(string str, int loc) : loc(loc) {
+    assert(str.size() > 1);
+    first = str[0];
+    second = str[1];
+}
+
+bool Pair::operator==(const Pair& other) const {
+    return (first == other.first) && (second == other.second);
+}
+
+
+Triple::Triple(char first, char second, char third, int loc) :
+    first(first), second(second), third(third), loc(loc) {}
+
+Triple::Triple(string str, int loc) : loc(loc) {
+    assert(str.size() > 2);
+    first = str[0];
+    second = str[1];
+    third = str[2];
+}
+
+bool Triple::nice(void) const {
+    return first == third;
+}
+
+bool pair_list_is_nice(const vector<Pair>& pairs) {
     for (size_t i=0; i<pairs.size()-1; i++) {
         for (size_t j=i+1; j<pairs.size(); j++) {
             Pair p1 = pairs[i];
@@ -112,13 +112,13 @@ bool pair_list_is_nice(vector<Pair> pairs) {
     return false;
 }
 
-bool triple_list_is_nice(vector<Triple> triples) {
+bool triple_list_is_nice(const vector<Triple>& triples) {
     for (const auto& t: triples)
         if (t.nice()) return true;
     return false;
 }
 
-vector<Pair> get_all_pairs(string str) {
+vector<Pair> get_all_pairs(const string& str) {
     int num_pairs = str.size() - 1;
     vector<Pair> result;
     result.reserve(num_pairs);
@@ -129,7 +129,7 @@ vector<Pair> get_all_pairs(string str) {
     return result;
 }
 
-vector<Triple> get_all_triples(string str) {
+vector<Triple> get_all_triples(const string& str) {
     int num_triples = str.size() - 2;
     vector<Triple> result;
     result.reserve(num_triples);
@@ -140,8 +140,8 @@ vector<Triple> get_all_triples(string str) {
     return result;
 }
 
+constexpr string vowels = "aeiou";
 int count_vowels_in_str(const string& str) {
-    string vowels = "aeiou";
     int result = 0;
     for (char c: str) 
         if (vowels.find(c) != vowels.npos) result += 1;
