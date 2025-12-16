@@ -33,7 +33,8 @@ struct Action {
     int y_dir;
     Action(ActionType type, Coord p1, Coord p2);
     Action(ActionType type, int x1, int y1, int x2, int y2);
-    void apply(vector<vector<int>>& grid) const;
+    void apply_part1(vector<vector<int>>& grid) const;
+    void apply_part2(vector<vector<int>>& grid) const;
 };
 
 Action::Action(ActionType type, Coord p1, Coord p2) : type(type), p1(p1), p2(p2) {
@@ -48,7 +49,7 @@ Action::Action(ActionType type, int x1, int y1, int x2, int y2) : type(type) {
     y_dir = (p2.y > p1.y) ? 1 : -1;
 }
 
-void Action::apply(vector<vector<int>>& grid) const {
+void Action::apply_part1(vector<vector<int>>& grid) const {
     for (int x=p1.x; x!=p2.x+x_dir; x+=x_dir) {
         for (int y=p1.y; y!=p2.y+y_dir; y+=y_dir) {
             if (type==TURNOFF) grid[x][y] = 0;
@@ -58,6 +59,21 @@ void Action::apply(vector<vector<int>>& grid) const {
                 println("ERROR: Unexpected type!");
                 exit(1);
             }
+        }
+    }
+}
+
+void Action::apply_part2(vector<vector<int>>& grid) const {
+    for (int x=p1.x; x!=p2.x+x_dir; x+=x_dir) {
+        for (int y=p1.y; y!=p2.y+y_dir; y+=y_dir) {
+            if (type==TURNOFF) grid[x][y] -= 1;
+            else if (type==TURNON) grid[x][y] += 1;
+            else if (type==TOGGLE) grid[x][y] += 2;
+            else {
+                println("ERROR: Unexpected type!");
+                exit(1);
+            }
+            if (grid[x][y] < 0) grid[x][y] = 0;
         }
     }
 }
@@ -114,21 +130,16 @@ int main(void) {
         actions.emplace_back(at, x1, y1, x2, y2);
     }
 
-    int sum = 0;
-    for (const auto& row: grid)
-        sum += std::reduce(row.begin(), row.end());
-    println("sum = {}", sum);
-
-    for (const auto& action: actions)
-        action.apply(grid);
-
     long part1 = 0;
-    for (const auto& row : grid) {
-        part1 += std::reduce(row.begin(), row.end());
-    }
+    for (const auto& action: actions) action.apply_part1(grid);
+    for (const auto& row : grid) part1 += std::reduce(row.begin(), row.end());
     assert(part1 == 543903);
 
     long part2 = 0;
+    for (auto& row: grid)
+        std::fill(row.begin(), row.end(), 0);
+    for (const auto& action: actions) action.apply_part2(grid);
+    for (const auto& row : grid) part2 += std::reduce(row.begin(), row.end());
 
     println("Part 1: {}", part1);
     println("Part 2: {}", part2);
