@@ -21,62 +21,19 @@ enum ActionType {
     TOGGLE,
 };
 
-struct Coord {
-    int x, y;
-};
+struct Coord { int x, y; };
 
-struct Action {
-    ActionType type;
-    Coord p1;
-    Coord p2;
-    int x_dir;
-    int y_dir;
-    Action(ActionType type, Coord p1, Coord p2);
+class Action {
+    const ActionType type;
+    const Coord p1;
+    const Coord p2;
+    const int x_dir;
+    const int y_dir;
+public:
     Action(ActionType type, int x1, int y1, int x2, int y2);
     void apply_part1(vector<vector<int>>& grid) const;
     void apply_part2(vector<vector<int>>& grid) const;
 };
-
-Action::Action(ActionType type, Coord p1, Coord p2) : type(type), p1(p1), p2(p2) {
-    x_dir = (p2.x > p1.x) ? 1 : -1;
-    y_dir = (p2.y > p1.y) ? 1 : -1;
-}
-
-Action::Action(ActionType type, int x1, int y1, int x2, int y2) : type(type) {
-    p1 = Coord{x1, y1};
-    p2 = Coord{x2, y2};
-    x_dir = (p2.x > p1.x) ? 1 : -1;
-    y_dir = (p2.y > p1.y) ? 1 : -1;
-}
-
-void Action::apply_part1(vector<vector<int>>& grid) const {
-    for (int x=p1.x; x!=p2.x+x_dir; x+=x_dir) {
-        for (int y=p1.y; y!=p2.y+y_dir; y+=y_dir) {
-            if (type==TURNOFF) grid[x][y] = 0;
-            else if (type==TURNON) grid[x][y] = 1;
-            else if (type==TOGGLE) grid[x][y] = (grid[x][y] - 1) * -1;
-            else {
-                println("ERROR: Unexpected type!");
-                exit(1);
-            }
-        }
-    }
-}
-
-void Action::apply_part2(vector<vector<int>>& grid) const {
-    for (int x=p1.x; x!=p2.x+x_dir; x+=x_dir) {
-        for (int y=p1.y; y!=p2.y+y_dir; y+=y_dir) {
-            if (type==TURNOFF) grid[x][y] -= 1;
-            else if (type==TURNON) grid[x][y] += 1;
-            else if (type==TOGGLE) grid[x][y] += 2;
-            else {
-                println("ERROR: Unexpected type!");
-                exit(1);
-            }
-            if (grid[x][y] < 0) grid[x][y] = 0;
-        }
-    }
-}
 
 std::expected<vector<string>, string> read_file(const string &filename);
 
@@ -85,7 +42,7 @@ constexpr string TURNONSTR = "turn on";
 constexpr string TOGGLESTR = "toggle";
 constexpr string THRUDELIM = "through";
 
-int main(void) {
+int main() {
     string filename = "data/input.txt";
     auto result = read_file(filename);
     if (!result) {
@@ -136,15 +93,47 @@ int main(void) {
     assert(part1 == 543903);
 
     long part2 = 0;
-    for (auto& row: grid)
-        std::fill(row.begin(), row.end(), 0);
+    grid.assign(ROWS, vector<int>(COLS, 0));
     for (const auto& action: actions) action.apply_part2(grid);
     for (const auto& row : grid) part2 += std::reduce(row.begin(), row.end());
+    assert(part2 == 14687245);
 
     println("Part 1: {}", part1);
     println("Part 2: {}", part2);
 
     return 0;
+}
+
+Action::Action(ActionType type, int x1, int y1, int x2, int y2) : 
+    type(type), p1(Coord{x1, y1}), p2(Coord{x2, y2}), x_dir((p2.x > p1.x) ? 1 : -1), y_dir((p2.y > p1.y) ? 1 : -1) {}
+
+void Action::apply_part1(vector<vector<int>>& grid) const {
+    for (int x=p1.x; x!=p2.x+x_dir; x+=x_dir) {
+        for (int y=p1.y; y!=p2.y+y_dir; y+=y_dir) {
+            if (type==TURNOFF) grid[x][y] = 0;
+            else if (type==TURNON) grid[x][y] = 1;
+            else if (type==TOGGLE) grid[x][y] = (grid[x][y] - 1) * -1;
+            else {
+                println("ERROR: Unexpected type!");
+                exit(1);
+            }
+        }
+    }
+}
+
+void Action::apply_part2(vector<vector<int>>& grid) const {
+    for (int x=p1.x; x!=p2.x+x_dir; x+=x_dir) {
+        for (int y=p1.y; y!=p2.y+y_dir; y+=y_dir) {
+            if (type==TURNOFF) grid[x][y] -= 1;
+            else if (type==TURNON) grid[x][y] += 1;
+            else if (type==TOGGLE) grid[x][y] += 2;
+            else {
+                println("ERROR: Unexpected type!");
+                exit(1);
+            }
+            if (grid[x][y] < 0) grid[x][y] = 0;
+        }
+    }
 }
 
 std::expected<vector<string>, string> read_file(const string &filename) {
